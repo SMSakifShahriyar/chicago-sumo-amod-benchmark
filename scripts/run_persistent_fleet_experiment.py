@@ -4,14 +4,21 @@ import argparse
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import math
+import shutil
 
 
-project_dir = r"E:\project_sakif_chicago"
-sumo_bin = r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo.exe"
-sumo_tools = r"C:\Program Files (x86)\Eclipse\Sumo\tools"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.abspath(os.path.join(script_dir, ".."))
+sumo_home = os.environ.get("SUMO_HOME", "")
+sumo_bin = os.environ.get("SUMO_BIN", "sumo")
+if not shutil.which(sumo_bin):
+    alt = "sumo.exe" if os.name == "nt" else "sumo"
+    if shutil.which(alt):
+        sumo_bin = alt
+sumo_tools = os.path.join(sumo_home, "tools") if sumo_home else ""
 
 import sys
-if sumo_tools not in sys.path:
+if sumo_tools and sumo_tools not in sys.path:
     sys.path.append(sumo_tools)
 
 import traci
