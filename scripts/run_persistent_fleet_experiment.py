@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 import math
 import shutil
+import subprocess
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -192,6 +193,15 @@ def setup_fleet_type():
         pass
 
 
+def supports_option(option_name):
+    try:
+        res = subprocess.run([sumo_bin, "--help"], capture_output=True, text=True, timeout=10)
+        text = (res.stdout or "") + "\n" + (res.stderr or "")
+        return option_name in text
+    except Exception:
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--policy", default="A")
@@ -237,7 +247,6 @@ def main():
         sumo_bin,
         "-n", os.path.join(project_dir, "net", "map_reduced_clean_auto_v2.net.xml"),
         "--tripinfo-output", tripinfo_file,
-        "--statistic-output", stats_file,
         "--summary-output", summary_xml,
         "--duration-log.statistics", "true",
         "--no-step-log", "true",
@@ -245,6 +254,8 @@ def main():
         "--begin", "0",
         "--end", str(args.end_time),
     ]
+    if supports_option("--statistic-output"):
+        cmd.extend(["--statistic-output", stats_file])
 
     traci.start(cmd)
     setup_fleet_type()
