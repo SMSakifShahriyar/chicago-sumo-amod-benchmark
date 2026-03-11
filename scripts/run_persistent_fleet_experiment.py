@@ -6,6 +6,7 @@ from datetime import datetime
 import math
 import shutil
 import subprocess
+import re
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -94,19 +95,61 @@ def load_demand_shares(zones):
     return share
 
 
-def read_requests(path):
+def infer_request_scale(request_path):
+    name = os.path.basename(request_path)
+    m = re.search(r"s0p(\d{3})", name)
+    if not m:
+        return ""
+    try:
+        return f"{int(m.group(1)) / 1000.0:.3f}"
+    except Exception:
+        return ""
+
+
+def read_requests(path, valid_zones, valid_edges):
     rows = []
     with open(path, "r", encoding="utf-8-sig", newline="") as f:
         r = csv.DictReader(f)
+        if r.fieldnames is None:
+            raise ValueError(f"request file has no header: {path}")
+        required = ["request_id", "request_time", "origin_zone", "destination_zone"]
+        for k in required:
+            if k not in r.fieldnames:
+                raise ValueError(f"request file missing required column '{k}': {path}")
+        has_origin_edge = "origin_edge" in r.fieldnames
+        has_destination_edge = "destination_edge" in r.fieldnames
+        if has_origin_edge != has_destination_edge:
+            raise ValueError("request file must include both origin_edge and destination_edge columns together")
+        edge_columns_used = has_origin_edge and has_destination_edge
         for row in r:
+            rid = (row.get("request_id") or "").strip()
+            oz = (row.get("origin_zone") or "").strip()
+            dz = (row.get("destination_zone") or "").strip()
+            if oz not in valid_zones:
+                raise ValueError(f"invalid origin_zone '{oz}' for request_id '{rid}'")
+            if dz not in valid_zones:
+                raise ValueError(f"invalid destination_zone '{dz}' for request_id '{rid}'")
+            oe = ""
+            de = ""
+            if edge_columns_used:
+                oe = (row.get("origin_edge") or "").strip()
+                de = (row.get("destination_edge") or "").strip()
+                if not oe or not de:
+                    raise ValueError(f"request_id '{rid}' has empty origin_edge/destination_edge with edge columns present")
+                if oe not in valid_edges:
+                    raise ValueError(f"request_id '{rid}' has invalid origin_edge '{oe}'")
+                if de not in valid_edges:
+                    raise ValueError(f"request_id '{rid}' has invalid destination_edge '{de}'")
             rows.append({
-                "request_id": row["request_id"].strip(),
+                "request_id": rid,
                 "request_time": int(float(row["request_time"])),
-                "origin_zone": row["origin_zone"].strip(),
-                "destination_zone": row["destination_zone"].strip(),
+                "origin_zone": oz,
+                "destination_zone": dz,
+                "origin_edge": oe,
+                "destination_edge": de,
             })
     rows.sort(key=lambda x: (x["request_time"], x["request_id"]))
-    return rows
+    return rows, edge_columns_used
 
 
 def choose_zone_from_shares(shares, index):
@@ -240,12 +283,18 @@ def main():
 
     zones, zone_edges, edge_zone = load_zone_edges()
     demand_share = load_demand_shares(zones)
-    requests = read_requests(args.request_file)
+    requests, request_edge_columns_used = read_requests(
+        args.request_file,
+        set(zones),
+        set(edge_zone.keys()),
+    )
     pick_edge = build_edge_pick(zone_edges)
+    network_file = os.path.join(project_dir, "net", "map_reduced_clean_auto_v2.net.xml")
+    request_scale = infer_request_scale(args.request_file)
 
     cmd = [
         sumo_bin,
-        "-n", os.path.join(project_dir, "net", "map_reduced_clean_auto_v2.net.xml"),
+        "-n", network_file,
         "--tripinfo-output", tripinfo_file,
         "--summary-output", summary_xml,
         "--duration-log.statistics", "true",
@@ -254,7 +303,8 @@ def main():
         "--begin", "0",
         "--end", str(args.end_time),
     ]
-    if supports_option("--statistic-output"):
+    statistics_output_enabled = supports_option("--statistic-output")
+    if statistics_output_enabled:
         cmd.extend(["--statistic-output", stats_file])
 
     traci.start(cmd)
@@ -368,8 +418,8 @@ def main():
                     continue
                 o_zone = req["origin_zone"]
                 d_zone = req["destination_zone"]
-                o_edge = pick_edge(o_zone)
-                d_edge = pick_edge(d_zone)
+                o_edge = req.get("origin_edge", "") or pick_edge(o_zone)
+                d_edge = req.get("destination_edge", "") or pick_edge(d_zone)
                 if not o_edge or not d_edge:
                     no_path += 1
                     continue
@@ -626,13 +676,41 @@ def main():
             for row in cgated_debug_rows:
                 w.writerow(row)
 
+    summary_ts = datetime.now().isoformat(timespec='seconds')
+
     lines = []
     lines.append("persistent fleet policy summary")
     lines.append("")
-    lines.append(f"timestamp={datetime.now().isoformat(timespec='seconds')}")
+    lines.append("provenance")
+    lines.append(f"summary_generation_timestamp={summary_ts}")
+    lines.append(f"policy={policy}")
+    lines.append(f"request_file={args.request_file}")
+    lines.append(f"request_scale={request_scale}")
+    lines.append(f"seed={args.seed}")
+    lines.append(f"fleet_size={args.fleet_size}")
+    lines.append(f"decision_interval={args.decision_interval}")
+    lines.append(f"same_zone_candidate_cap={args.same_zone_candidate_cap}")
+    lines.append(f"global_candidate_cap={args.global_candidate_cap}")
+    lines.append(f"rebalance_min_shortage={args.rebalance_min_shortage}")
+    lines.append(f"rebalance_shortage_threshold={args.rebalance_shortage_threshold}")
+    lines.append(f"rebalance_intensity_scale={args.rebalance_intensity_scale}")
+    lines.append(f"max_rebalance_share={args.max_rebalance_share}")
+    lines.append(f"max_rebalance_count={args.max_rebalance_count}")
+    lines.append(f"network_file={network_file}")
+    lines.append(f"request_edge_columns_used={'yes' if request_edge_columns_used else 'no'}")
+    lines.append(f"statistics_output_enabled={'yes' if statistics_output_enabled else 'no'}")
+    lines.append(f"statistics_file={stats_file if statistics_output_enabled else ''}")
+    lines.append(f"summary_xml_file={summary_xml}")
+    lines.append(f"tripinfo_file={tripinfo_file}")
+    lines.append(f"policy_log_file={policy_log}")
+    lines.append(f"run_log_file={run_log}")
+    lines.append(f"stage_summary_file={stage1_txt}")
+    lines.append(f"output_prefix={prefix}")
+    lines.append("")
+    lines.append("metrics")
+    lines.append(f"timestamp={summary_ts}")
     lines.append(f"fleet_size_configured={args.fleet_size}")
     lines.append(f"fleet_size_initialized={fleet_init_count}")
-    lines.append(f"request_file={args.request_file}")
     lines.append(f"total_requests={len(requests)}")
     lines.append(f"requests_released={req_idx}")
     lines.append(f"requests_assigned={assigned}")
@@ -686,7 +764,13 @@ def main():
     stage_lines = []
     stage_lines.append("persistent fleet stage1 summary")
     stage_lines.append("")
-    stage_lines.append("implemented_components=request_stream_builder,persistent_vehicle_initializer,policy_A_dispatch")
+    stage_lines.append(f"summary_generation_timestamp={summary_ts}")
+    stage_lines.append(f"policy={policy}")
+    stage_lines.append(f"request_file={args.request_file}")
+    stage_lines.append(f"request_scale={request_scale}")
+    stage_lines.append(f"seed={args.seed}")
+    stage_lines.append(f"decision_interval={args.decision_interval}")
+    stage_lines.append("implemented_components=request_stream_builder,persistent_vehicle_initializer,dispatch,rebalancing_policy")
     stage_lines.append(f"fleet_size={args.fleet_size}")
     stage_lines.append(f"total_requests={len(requests)}")
     stage_lines.append(f"served_requests={served}")
@@ -705,6 +789,11 @@ def main():
         f.write(f"same_zone_candidate_cap={args.same_zone_candidate_cap}\n")
         f.write(f"global_candidate_cap={args.global_candidate_cap}\n")
         f.write(f"seed={args.seed}\n")
+        f.write(f"request_scale={request_scale}\n")
+        f.write(f"network_file={network_file}\n")
+        f.write(f"request_file={args.request_file}\n")
+        f.write(f"request_edge_columns_used={'yes' if request_edge_columns_used else 'no'}\n")
+        f.write(f"statistics_output_enabled={'yes' if statistics_output_enabled else 'no'}\n")
         f.write(f"max_rebalance_share={args.max_rebalance_share}\n")
         f.write(f"max_rebalance_count={args.max_rebalance_count}\n")
         f.write(f"rebalance_shortage_threshold={args.rebalance_shortage_threshold}\n")
@@ -719,6 +808,7 @@ def main():
     print("policy=" + policy)
     print("fleet_size=" + str(args.fleet_size))
     print("request_stream=" + args.request_file)
+    print("request_scale=" + request_scale)
     print("total_requests=" + str(len(requests)))
     print("requests_served=" + str(served))
     print("requests_waiting_end=" + str(len(open_queue)))
