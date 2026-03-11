@@ -7,7 +7,8 @@ import xml.etree.ElementTree as ET
 
 import matplotlib.pyplot as plt
 
-project_dir = Path(r"E:\project_sakif_chicago")
+script_dir = Path(__file__).resolve().parent
+project_dir = script_dir.parent
 out_dir = project_dir / "output"
 vis_dir = project_dir / "visuals"
 scripts_dir = project_dir / "scripts"
