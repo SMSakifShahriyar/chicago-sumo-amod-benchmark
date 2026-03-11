@@ -2,6 +2,8 @@ import os
 import csv
 import math
 import argparse
+import xml.etree.ElementTree as ET
+import numpy as np
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -35,11 +37,59 @@ def allocate(total_int, weights, keys):
     return base
 
 
+def scale_tag(scale):
+    return f"0p{int(round(scale * 1000)):03d}"
+
+
+def load_service_edges(zones):
+    edge_map = {}
+    for z in zones:
+        p = os.path.join(project_dir, "data", f"compact4_service_edges_{z}.txt")
+        edges = []
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                for line in f:
+                    e = line.strip()
+                    if e:
+                        edges.append(e)
+        edge_map[z] = edges
+
+    taz_file = os.path.join(project_dir, "data", "compact4_zones.taz.xml")
+    if os.path.exists(taz_file):
+        root = ET.parse(taz_file).getroot()
+        for taz in root.findall("taz"):
+            zid = (taz.get("id") or "").strip()
+            if zid in edge_map and edge_map[zid]:
+                continue
+            raw = (taz.get("edges") or "").strip().split()
+            edge_map[zid] = [e for e in raw if e]
+    return edge_map
+
+
+def pick_edge(rng, edge_map, zone):
+    edges = edge_map.get(zone, [])
+    if not edges:
+        return ""
+    idx = int(rng.integers(0, len(edges)))
+    return edges[idx]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--scale", type=float, default=0.10)
-    parser.add_argument("--output", default=out_file)
+    parser.add_argument("--seed", type=int, default=101)
+    parser.add_argument("--output", default="")
     args = parser.parse_args()
+    rng = np.random.default_rng(args.seed)
+
+    if args.output.strip():
+        out_path = args.output
+    else:
+        out_path = os.path.join(
+            project_dir,
+            "data",
+            f"compact4_request_stream_s{scale_tag(args.scale)}_seed{args.seed}.csv",
+        )
 
     zones = []
     od = {}
@@ -83,6 +133,7 @@ def main():
     target_total = int(round(od_total * args.scale))
     hour_alloc = allocate(target_total, hour_weights, hours)
     od_keys = [(o, d) for o in zones for d in zones]
+    service_edges = load_service_edges(zones)
 
     rows = []
     rid = 1
@@ -91,30 +142,44 @@ def main():
         if n <= 0:
             continue
         od_alloc = allocate(n, od_weights, od_keys)
-        counter = 0
         for (o, d), c in od_alloc.items():
-            for _ in range(c):
-                t = h * 3600 + int(((counter + 0.5) / n) * 3600)
+            if c <= 0:
+                continue
+            offsets = rng.integers(0, 3600, size=c)
+            for i in range(c):
+                t = h * 3600 + int(offsets[i])
                 rows.append({
                     "request_id": f"r{rid:07d}",
                     "request_time": t,
                     "origin_zone": o,
                     "destination_zone": d,
+                    "origin_edge": pick_edge(rng, service_edges, o),
+                    "destination_edge": pick_edge(rng, service_edges, d),
                 })
                 rid += 1
-                counter += 1
 
     rows.sort(key=lambda x: (x["request_time"], x["request_id"]))
 
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    with open(args.output, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["request_id", "request_time", "origin_zone", "destination_zone"])
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(
+            f,
+            fieldnames=[
+                "request_id",
+                "request_time",
+                "origin_zone",
+                "destination_zone",
+                "origin_edge",
+                "destination_edge",
+            ],
+        )
         w.writeheader()
         for row in rows:
             w.writerow(row)
 
-    print("request_stream_file=" + args.output)
+    print("request_stream_file=" + out_path)
     print("scale=" + str(args.scale))
+    print("seed=" + str(args.seed))
     print("total_requests=" + str(len(rows)))
     print("zones=" + ",".join(zones))
 
