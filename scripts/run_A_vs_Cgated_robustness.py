@@ -70,8 +70,28 @@ def mean_std(vals):
     return float(statistics.mean(vals)), float(statistics.stdev(vals))
 
 
-def load_existing_005(policy, seed):
-    tag = f"robust_{policy}_s{seed}"
+def scale_tag(scale):
+    return f"{int(round(scale * 1000)):03d}"
+
+
+def get_request_file(scale):
+    tag = scale_tag(scale)
+    req_file = project_dir / "data" / f"compact4_request_stream_s0p{tag}.csv"
+    if req_file.exists():
+        return req_file
+    builder = scripts_dir / "build_request_stream.py"
+    cmd = [
+        "python", str(builder),
+        "--scale", str(scale),
+        "--output", str(req_file),
+    ]
+    p = subprocess.run(cmd, capture_output=True, text=True)
+    if p.returncode != 0:
+        raise RuntimeError(f"failed to build request stream for scale={scale}: {p.stderr}")
+    return req_file
+
+
+def parse_existing(policy, scale, seed, tag, source_name):
     sfile = out_dir / f"{tag}_summary.txt"
     xfile = out_dir / f"{tag}_statistics.xml"
     if not sfile.exists():
@@ -80,7 +100,7 @@ def load_existing_005(policy, seed):
     tele, col = parse_stats(xfile)
     return {
         "policy": policy,
-        "request_scale": 0.005,
+        "request_scale": scale,
         "seed": seed,
         "total_requests": total,
         "requests_served": served,
@@ -92,20 +112,18 @@ def load_existing_005(policy, seed):
         "run_return_code": 0,
         "runtime_sec": "",
         "output_prefix": tag,
-        "source": "existing_robust_005",
+        "source": source_name,
     }
 
 
 def run_one(policy, request_scale, seed):
-    tag_scale = str(request_scale).replace(".", "p")
+    tag_scale = f"0p{scale_tag(request_scale)}"
     tag = f"robmap_{policy}_s{seed}_r{tag_scale}"
-    req_file = project_dir / "data" / f"compact4_request_stream_s0p{int(request_scale*1000):03d}.csv"
-    if request_scale == 0.004:
-        req_file = project_dir / "data" / "compact4_request_stream_s0p04.csv"
-    if request_scale == 0.005:
-        req_file = project_dir / "data" / "compact4_request_stream_s0p005.csv"
-    if request_scale == 0.006:
-        req_file = project_dir / "data" / "compact4_request_stream_s0p006.csv"
+    existing = parse_existing(policy, request_scale, seed, tag, "existing_robmap")
+    if existing is not None:
+        return existing
+
+    req_file = get_request_file(request_scale)
 
     cmd = [
         "python", str(runner),
@@ -180,14 +198,21 @@ def main():
         for seed in seeds:
             for policy in policies:
                 if scale == 0.005:
-                    existing = load_existing_005(policy, seed)
-                    if existing is not None:
-                        rows.append(existing)
-                        print(f"reuse scale={scale} seed={seed} policy={policy} served={existing['requests_served']}")
+                    old_tag = f"robust_{policy}_s{seed}"
+                    old_existing = parse_existing(policy, scale, seed, old_tag, "existing_robust_005")
+                    if old_existing is not None:
+                        rows.append(old_existing)
+                        print(f"reuse scale={scale} seed={seed} policy={policy} served={old_existing['requests_served']}")
                         continue
                 row = run_one(policy, scale, seed)
                 rows.append(row)
                 if row.get("run_return_code") == 0:
+                    if str(row.get("source", "")).startswith("existing_"):
+                        print(
+                            f"reuse scale={scale} seed={seed} policy={policy} "
+                            f"served={row['requests_served']} source={row['source']}"
+                        )
+                        continue
                     print(
                         f"done scale={scale} seed={seed} policy={policy} "
                         f"served={row['requests_served']} waiting={row['requests_waiting_end']} "
