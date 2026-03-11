@@ -4,7 +4,8 @@ import math
 import argparse
 
 
-project_dir = r"E:\project_sakif_chicago"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.abspath(os.path.join(script_dir, ".."))
 od_file = os.path.join(project_dir, "output", "compact4_od_matrix.csv")
 time_file = os.path.join(project_dir, "output", "compact4_time_profile.csv")
 out_file = os.path.join(project_dir, "data", "compact4_request_stream.csv")
