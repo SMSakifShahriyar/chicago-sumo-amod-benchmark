@@ -1,0 +1,27 @@
+Heuristic Robustness Summary (A vs C_gated fix1)
+
+frozen_operating_point
+fleet_size=300
+dispatch_interval=15
+request_scale=0.005
+candidate_caps=15/15
+seed_list=101,202,303,404,505
+
+policy=A,seed=101,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0,moves=0
+policy=CG,seed=101,served=591,waiting=792,served_fraction=0.427023,teleports=0,collisions=0,moves=17
+policy=A,seed=202,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0,moves=0
+policy=CG,seed=202,served=591,waiting=792,served_fraction=0.427023,teleports=0,collisions=0,moves=17
+policy=A,seed=303,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0,moves=0
+policy=CG,seed=303,served=591,waiting=792,served_fraction=0.427023,teleports=0,collisions=0,moves=17
+policy=A,seed=404,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0,moves=0
+policy=CG,seed=404,served=591,waiting=792,served_fraction=0.427023,teleports=0,collisions=0,moves=17
+policy=A,seed=505,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0,moves=0
+policy=CG,seed=505,served=591,waiting=792,served_fraction=0.427023,teleports=0,collisions=0,moves=17
+
+A: served_mean=566.000 served_sd=0.000, waiting_mean=817.000 waiting_sd=0.000, served_fraction_mean=0.408960 served_fraction_sd=0.000000, teleports_mean=0.000, collisions_mean=0.000, moves_mean=0.000 moves_sd=0.000
+CG: served_mean=591.000 served_sd=0.000, waiting_mean=792.000 waiting_sd=0.000, served_fraction_mean=0.427023 served_fraction_sd=0.000000, teleports_mean=0.000, collisions_mean=0.000, moves_mean=17.000 moves_sd=0.000
+
+delta_CG_minus_A_served_mean=25.000
+delta_CG_minus_A_waiting_mean=-25.000
+delta_CG_minus_A_served_fraction_mean=0.018063
+CG_better_than_A_on_mean=yes

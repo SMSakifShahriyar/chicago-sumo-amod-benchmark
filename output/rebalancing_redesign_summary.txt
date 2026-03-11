@@ -1,0 +1,20 @@
+rebalancing redesign summary
+
+redesign_rule
+- policy variant: C_gated
+- keep policy C structure (demand-share balancing)
+- trigger only for meaningful deficit: shortage >= max(2, 8% of idle pool)
+- throttle effective move cap with intensity scale 0.35
+
+A: served=566, waiting_end=817, served_fraction=0.408960, teleports=0, collisions=0, rebalance_moves=0, dest_hit_rate=0.000
+C: served=550, waiting_end=833, served_fraction=0.397399, teleports=0, collisions=0, rebalance_moves=261, dest_hit_rate=0.333
+C_gated: served=566, waiting_end=817, served_fraction=0.408960, teleports=0, collisions=0, rebalance_moves=0, dest_hit_rate=0.000
+
+comparison
+C_gated_vs_C_served_delta=16
+C_gated_vs_C_waiting_delta=-16
+C_gated_vs_C_served_fraction_delta=0.011561
+C_gated_vs_A_served_delta=0
+C_gated_vs_A_waiting_delta=0
+C_gated_better_than_C=yes
+C_gated_better_than_A=no

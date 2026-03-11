@@ -1,0 +1,10 @@
+policy,seed,total_requests,requests_assigned,requests_served,requests_waiting_end,served_fraction,teleports,collisions,run_return_code,output_prefix
+A,101,1384,567,566,817,0.40896,0,0,0,controlled_A_seed101
+B,101,1384,515,514,869,0.371387,0,0,0,controlled_B_seed101
+C,101,1384,551,550,833,0.397399,0,0,0,controlled_C_seed101
+A,202,1384,567,566,817,0.40896,0,0,0,controlled_A_seed202
+B,202,1384,515,514,869,0.371387,0,0,0,controlled_B_seed202
+C,202,1384,551,550,833,0.397399,0,0,0,controlled_C_seed202
+A,303,1384,567,566,817,0.40896,0,0,0,controlled_A_seed303
+B,303,1384,515,514,869,0.371387,0,0,0,controlled_B_seed303
+C,303,1384,551,550,833,0.397399,0,0,0,controlled_C_seed303

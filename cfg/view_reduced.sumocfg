@@ -1,0 +1,5 @@
+<configuration>
+    <input>
+        <net-file value="..\net\map_reduced.net.xml"/>
+    </input>
+</configuration>

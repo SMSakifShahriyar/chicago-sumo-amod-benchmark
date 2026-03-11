@@ -1,0 +1,21 @@
+randomness control audit
+
+before
+- request stream was fixed and deterministic.
+- fleet initialization logic was deterministic.
+- SUMO seed was passed, but per-vehicle stochastic behavior could still differ by seed and interact with policy actions.
+
+fixes applied
+- explicit --seed is used in controlled runs for all policies.
+- within each seed, A/B/C use the same request file and same frozen operating point.
+- fleet vehicle type is now forced to deterministic settings (imperfection=0, speedDeviation=0).
+- fleet initialization and edge picking remain deterministic across policies.
+
+fairness
+- common random numbers across A/B/C are now enforced as far as practical in this setup.
+- comparison is now fairer because exogenous randomness is controlled and shared within seed.
+
+controlled repeatability
+- ranking_A_lt_B_lt_C_stable=no
+- results_file=E:\project_sakif_chicago\output\policy_repeatability_controlled.csv
+- summary_file=E:\project_sakif_chicago\output\policy_repeatability_controlled_summary.txt

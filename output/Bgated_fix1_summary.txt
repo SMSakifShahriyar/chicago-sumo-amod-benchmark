@@ -1,0 +1,23 @@
+B_gated fix1 summary
+
+B_gated rule used
+- keep Policy B target logic (move idle vehicles toward strongest shortage zone)
+- apply gate: shortage >= max(1, 8% of idle pool)
+- apply throttle: effective move cap x 0.35
+
+A: served=566, waiting_end=817, served_fraction=0.408960, teleports=0, collisions=0, rebalance_moves=0
+B: served=514, waiting_end=869, served_fraction=0.371387, teleports=0, collisions=0, rebalance_moves=1684
+C_gated_fix1: served=591, waiting_end=792, served_fraction=0.427023, teleports=0, collisions=0, rebalance_moves=17
+B_gated_fix1: served=465, waiting_end=918, served_fraction=0.335983, teleports=0, collisions=0, rebalance_moves=23
+
+comparison
+B_gated_vs_B_served_delta=-49
+B_gated_vs_B_waiting_delta=49
+B_gated_vs_B_served_fraction_delta=-0.035405
+B_gated_vs_A_served_delta=-101
+B_gated_vs_A_waiting_delta=101
+B_gated_vs_Cgated_served_delta=-126
+B_gated_vs_Cgated_waiting_delta=126
+B_gated_improved_over_B=no
+B_gated_beats_A=no
+B_gated_beats_C_gated_fix1=no

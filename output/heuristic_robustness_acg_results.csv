@@ -1,0 +1,11 @@
+policy,seed,total_requests,requests_assigned,requests_served,requests_waiting_end,served_fraction,teleports,collisions,rebalance_moves,run_return_code,output_prefix
+A,101,1384,567,566,817,0.40896,0,0,0,0,robust_A_s101
+CG,101,1384,592,591,792,0.427023,0,0,17,0,robust_CG_s101
+A,202,1384,567,566,817,0.40896,0,0,0,0,robust_A_s202
+CG,202,1384,592,591,792,0.427023,0,0,17,0,robust_CG_s202
+A,303,1384,567,566,817,0.40896,0,0,0,0,robust_A_s303
+CG,303,1384,592,591,792,0.427023,0,0,17,0,robust_CG_s303
+A,404,1384,567,566,817,0.40896,0,0,0,0,robust_A_s404
+CG,404,1384,592,591,792,0.427023,0,0,17,0,robust_CG_s404
+A,505,1384,567,566,817,0.40896,0,0,0,0,robust_A_s505
+CG,505,1384,592,591,792,0.427023,0,0,17,0,robust_CG_s505

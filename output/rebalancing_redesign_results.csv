@@ -1,0 +1,4 @@
+policy,total_requests,requests_assigned,requests_served,requests_waiting_end,served_fraction,teleports,collisions,rebalance_moves,rebalance_moves_log,dest_hit_rate,no_next_assign_rate,idle_exists
+A,1384,567,566,817,0.40896,0,0,0,0,0.0,0.0,yes
+C,1384,551,550,833,0.397399,0,0,261,261,0.333333,0.0,yes
+C_gated,1384,567,566,817,0.40896,0,0,0,0,0.0,0.0,yes

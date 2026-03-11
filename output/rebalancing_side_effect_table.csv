@@ -1,0 +1,4 @@
+policy,total_requests,requests_assigned,requests_served,requests_waiting_end,served_fraction,teleports,collisions,avg_route_length,avg_waiting_time_stats,avg_time_loss_stats,rebalance_moves,move_per_served,move_per_assigned,assign_request_events,idle_keepalive_events,rebalance_move_events,next_assign_to_rebalance_dest,next_assign_to_rebalance_source,next_assign_to_other_zone,rebalance_no_next_assign,avg_delay_to_next_assign
+A,1384,567,566,817,0.40896,0,0,1877.2,160.17,241.39,0,0.0,0.0,567,4920,0,0,0,0,0,0.0
+B,1384,515,514,869,0.371387,0,0,1795.17,153.77,221.53,1684,3.276265,3.269903,515,3280,1684,297,327,1060,0,5646.511
+C,1384,551,550,833,0.397399,0,0,2000.79,165.71,247.73,261,0.474545,0.473684,551,4907,261,87,32,142,0,1884.713

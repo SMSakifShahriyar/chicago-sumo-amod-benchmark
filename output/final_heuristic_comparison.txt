@@ -1,0 +1,9 @@
+final heuristic policy comparison
+
+A: served=566, waiting_end=817, served_fraction=0.408960, teleports=0, collisions=0, rebalance_moves=0
+B: served=514, waiting_end=869, served_fraction=0.371387, teleports=0, collisions=0, rebalance_moves=1684
+C: served=550, waiting_end=833, served_fraction=0.397399, teleports=0, collisions=0, rebalance_moves=261
+C_gated_fix1: served=591, waiting_end=792, served_fraction=0.427023, teleports=0, collisions=0, rebalance_moves=17
+
+ranking_by_served_then_waiting
+C_gated_fix1 > A > C > B

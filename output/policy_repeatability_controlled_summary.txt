@@ -1,0 +1,24 @@
+policy repeatability controlled summary
+
+frozen_operating_point
+fleet_size=300
+dispatch_interval=15
+request_scale=0.005
+same_zone_candidate_cap=15
+global_candidate_cap=15
+max_rebalance_share=0.15
+max_rebalance_count=25
+seeds=[101, 202, 303]
+
+policy=A,seed=101,total=1384,assigned=567,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0
+policy=B,seed=101,total=1384,assigned=515,served=514,waiting=869,served_fraction=0.371387,teleports=0,collisions=0
+policy=C,seed=101,total=1384,assigned=551,served=550,waiting=833,served_fraction=0.397399,teleports=0,collisions=0
+policy=A,seed=202,total=1384,assigned=567,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0
+policy=B,seed=202,total=1384,assigned=515,served=514,waiting=869,served_fraction=0.371387,teleports=0,collisions=0
+policy=C,seed=202,total=1384,assigned=551,served=550,waiting=833,served_fraction=0.397399,teleports=0,collisions=0
+policy=A,seed=303,total=1384,assigned=567,served=566,waiting=817,served_fraction=0.40896,teleports=0,collisions=0
+policy=B,seed=303,total=1384,assigned=515,served=514,waiting=869,served_fraction=0.371387,teleports=0,collisions=0
+policy=C,seed=303,total=1384,assigned=551,served=550,waiting=833,served_fraction=0.397399,teleports=0,collisions=0
+
+ranking_A_lt_B_lt_C_stable=no
+freeze_policy_C=no

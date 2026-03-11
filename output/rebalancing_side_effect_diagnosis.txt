@@ -1,0 +1,38 @@
+rebalancing side-effect diagnosis
+
+scope
+- controlled runs at seed=101 under frozen operating point
+- compared policies A, B, C using policy logs + summary + statistics
+
+core outcomes
+- A: served=566, waiting_end=817, served_fraction=0.408960
+- B: served=514, waiting_end=869, served_fraction=0.371387
+- C: served=550, waiting_end=833, served_fraction=0.397399
+
+rebalancing burden
+- B rebalance moves=1684 (3.276 moves per served request)
+- C rebalance moves=261 (0.475 moves per served request)
+- B avg route length proxy=1795.17 vs A=1877.20
+- C avg route length proxy=2000.79 vs A=1877.20
+
+move usefulness
+- B next-assignment hit to rebalance destination=0.176, no-next-assignment=0.000, avg delay to next assignment=5646.5s
+- C next-assignment hit to rebalance destination=0.333, no-next-assignment=0.000, avg delay to next assignment=1884.7s
+
+zone drain/fill pattern
+- B top source zones: cz4:657, cz3:589, cz2:256, cz1:182
+- B top destination zones: cz4:700, cz3:570, cz2:290, cz1:124
+- C top source zones: cz2:156, cz1:47, cz3:41, cz4:17
+- C top destination zones: cz4:79, cz1:66, cz2:59, cz3:57
+
+diagnosis
+- B likely underperforms because repositioning burden is very high and concentrated, causing churn and weaker near-term assignment availability.
+- C reduces this burden substantially and is closer to A, but still introduces extra empty movement and mild mistiming compared with A's pure local assignment behavior.
+- At this load level, demand pressure is moderate enough that frequent proactive repositioning can be counterproductive.
+
+interpretation
+- most likely reason for ranking A > C > B: excessive and mistimed empty repositioning, strongest in B, moderate in C.
+- both B and C stay safe (0 teleports, 0 collisions), so this is an efficiency issue rather than a safety failure.
+
+recommended next step
+- do a small policy redesign focused only on throttling and gating rebalancing (not a full redesign): reduce unnecessary moves and trigger only under stronger local shortage signals.

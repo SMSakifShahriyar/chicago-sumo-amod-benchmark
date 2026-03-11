@@ -1,0 +1,5 @@
+<configuration>
+    <input>
+        <net-file value="..\net\map_reduced_clean_auto_v3.net.xml"/>
+    </input>
+</configuration>

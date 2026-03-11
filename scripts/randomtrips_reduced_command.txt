@@ -1,0 +1,1 @@
+python "C:\Program Files (x86)\Eclipse\Sumo\\tools\randomTrips.py" -n "E:\project_sakif_chicago\net\map_reduced.net.xml" -o "E:\project_sakif_chicago\routes\test_reduced.trips.xml" -r "E:\project_sakif_chicago\routes\test_reduced.rou.xml" --seed 42 -e 600 -p 2.5 --validate --remove-loops

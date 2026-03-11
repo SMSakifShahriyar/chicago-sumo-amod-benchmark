@@ -1,0 +1,10 @@
+<configuration>
+    <input>
+        <net-file value="..\net\map_reduced_no_bike.net.xml"/>
+        <route-files value="..\routes\test_reduced_no_bike.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="900"/>
+    </time>
+</configuration>

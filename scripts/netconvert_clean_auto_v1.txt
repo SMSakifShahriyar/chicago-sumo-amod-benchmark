@@ -1,0 +1,1 @@
+netconvert --osm-files "E:\project_sakif_chicago\map_reduced.osm" --output-file "E:\project_sakif_chicago\net\map_reduced_clean_auto_v1.net.xml" --junctions.join false --tls.guess-signals true --tls.discard-simple false --keep-edges.by-vclass passenger --remove-edges.isolated --keep-edges.components 1

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <input>
+        <net-file value="E:\project_sakif_chicago\net\map_reduced_clean_auto_v2.net.xml"/>
+        <route-files value="E:\project_sakif_chicago\routes\compact4_benchmark.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="86400"/>
+    </time>
+    <output>
+        <tripinfo-output value="E:\project_sakif_chicago\output\baseline_tripinfo.xml"/>
+        <summary-output value="E:\project_sakif_chicago\output\baseline_summary.xml"/>
+        <statistic-output value="E:\project_sakif_chicago\output\baseline_statistics.xml"/>
+        <edgedata-output value="E:\project_sakif_chicago\output\baseline_queue_or_edge_stats.xml"/>
+    </output>
+    <report>
+        <verbose value="true"/>
+        <duration-log.statistics value="true"/>
+        <no-step-log value="true"/>
+    </report>
+</configuration>

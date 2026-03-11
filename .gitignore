@@ -1,0 +1,45 @@
+# Raw external datasets
+Taxi_Trips_*.csv
+Boundaries_-_Community_Areas_*.csv
+
+# Python cache
+__pycache__/
+*.pyc
+.venv/
+
+# Logs and temp
+*.log
+
+# Large generated outputs: keep only selected summaries
+output/*
+!output/final_heuristic_comparison.csv
+!output/final_heuristic_comparison.txt
+!output/advisor_facing_heuristic_summary.txt
+!output/policy_repeatability_controlled.csv
+!output/policy_repeatability_controlled_summary.txt
+!output/randomness_control_audit.txt
+!output/rebalancing_side_effect_diagnosis.txt
+!output/rebalancing_side_effect_table.csv
+!output/rebalancing_redesign_results.csv
+!output/rebalancing_redesign_summary.txt
+!output/Cgated_fix1_results.csv
+!output/Cgated_fix1_summary.txt
+!output/Bgated_fix1_results.csv
+!output/Bgated_fix1_summary.txt
+!output/heuristic_robustness_acg_results.csv
+!output/heuristic_robustness_acg_summary.txt
+!output/compact4_od_matrix.csv
+!output/compact4_time_profile.csv
+!output/official5_to_compact4_crosswalk.csv
+
+# Keep only final presentation visual
+visuals/*
+!visuals/final_heuristic_comparison.png
+
+# Ignore extra XML artifacts in scripts folder
+scripts/*.net.xml
+scripts/*.netccfg
+scripts/*.edg.xml
+scripts/*.nod.xml
+scripts/*.tll.xml
+scripts/*.typ.xml

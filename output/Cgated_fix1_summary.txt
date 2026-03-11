@@ -1,0 +1,19 @@
+C_gated fix1 summary
+
+single change applied
+- rebalance_min_shortage: 2 -> 1
+- all other settings unchanged
+
+A: served=566, waiting_end=817, served_fraction=0.408960, teleports=0, collisions=0, rebalance_moves=0
+C: served=550, waiting_end=833, served_fraction=0.397399, teleports=0, collisions=0, rebalance_moves=261
+C_gated_prev: served=566, waiting_end=817, served_fraction=0.408960, teleports=0, collisions=0, rebalance_moves=0
+C_gated_fix1: served=591, waiting_end=792, served_fraction=0.427023, teleports=0, collisions=0, rebalance_moves=17
+
+comparison
+fix1_vs_prev_gated_served_delta=25
+fix1_vs_prev_gated_waiting_delta=-25
+fix1_vs_A_served_delta=25
+fix1_vs_A_waiting_delta=-25
+fix1_vs_C_served_delta=41
+fix1_vs_C_waiting_delta=-41
+C_gated_fix1_beats_A=yes

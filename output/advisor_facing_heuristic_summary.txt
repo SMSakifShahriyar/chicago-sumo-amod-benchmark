@@ -1,0 +1,24 @@
+Advisor-facing heuristic-stage summary
+
+Benchmark setup
+- Persistent-fleet AMoD-style simulation with request queue and persistent vehicle states.
+- Frozen operating point: fleet_size=300, dispatch_interval=15s, request_scale=0.005, candidate caps=15/15.
+- Controlled reproducible comparison with shared scenario settings and controlled randomness.
+
+Heuristic-stage result
+- Policy A (no rebalancing) remains a strong baseline.
+- Naive Policy B and naive Policy C did not improve over A at this operating point.
+- A minimal gated demand-share variant (C_gated fix1) performed best in this benchmark.
+
+Final benchmark-specific ranking
+- C_gated_fix1 > A > C > B (by served requests; waiting-end consistent).
+
+Cautious interpretation
+- This result is benchmark-specific and operating-point-specific.
+- We do not claim universal superiority of one heuristic across all AMoD settings.
+- The evidence supports that at this operating point, lightly gated demand-share rebalancing reduced empty-move churn enough to outperform the naive alternatives.
+
+Literature-aligned framing
+- Persistent fleet dynamics before rebalancing evaluation.
+- Reproducible baseline-first comparison before advanced methods.
+- Naive rebalancing can be counterproductive in a given benchmark, while targeted and throttled repositioning can perform better.

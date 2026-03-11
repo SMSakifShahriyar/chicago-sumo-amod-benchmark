@@ -1,0 +1,10 @@
+<configuration>
+    <input>
+        <net-file value="..\net\map_reduced_clean_auto_v2.net.xml"/>
+        <route-files value="..\routes\test_clean_auto_v2.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="900"/>
+    </time>
+</configuration>

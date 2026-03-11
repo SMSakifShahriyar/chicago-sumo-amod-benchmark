@@ -1,0 +1,10 @@
+<configuration>
+    <input>
+        <net-file value="..\net\map_reduced.net.xml"/>
+        <route-files value="..\routes\test_reduced.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="900"/>
+    </time>
+</configuration>

@@ -1,0 +1,1 @@
+netconvert --osm-files "E:\project_sakif_chicago\map_reduced.osm" --output-file "E:\project_sakif_chicago\net\map_reduced.net.xml" --junctions.join false --tls.guess-signals true --tls.discard-simple false
